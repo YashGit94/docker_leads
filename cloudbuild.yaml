@@ -1,0 +1,39 @@
+steps:
+  # Step 1: Build the container image using the Dockerfile
+  - name: 'gcr.io/cloud-builders/docker'
+    args: [
+      'build', 
+      '-t', '$_REGION-docker.pkg.dev/$PROJECT_ID/$_REPO_NAME/leads-app:$COMMIT_SHA', 
+      '.'
+    ]
+
+  # Step 2: Push the image to Artifact Registry
+  - name: 'gcr.io/cloud-builders/docker'
+    args: [
+      'push', 
+      '$_REGION-docker.pkg.dev/$PROJECT_ID/$_REPO_NAME/leads-app:$COMMIT_SHA'
+    ]
+
+  # Step 3: Deploy to Cloud Run
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: gcloud
+    args:
+      - 'run'
+      - 'deploy'
+      - 'leads-service'
+      - '--image'
+      - '$_REGION-docker.pkg.dev/$PROJECT_ID/$_REPO_NAME/leads-app:$COMMIT_SHA'
+      - '--region'
+      - '$_REGION'
+      - '--platform'
+      - 'managed'
+      - '--allow-unauthenticated'
+
+images:
+  - '$_REGION-docker.pkg.dev/$PROJECT_ID/$_REPO_NAME/leads-app:$COMMIT_SHA'
+options:
+  logging: CLOUD_LOGGING_ONLY
+
+substitutions:
+  _REGION: us-central1  # Change to your preferred region
+  _REPO_NAME: my-repo # Change to your Artifact Registry repo name
