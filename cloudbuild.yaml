@@ -25,10 +25,11 @@ steps:
       - '$_REGION-docker.pkg.dev/$PROJECT_ID/$_REPO_NAME/leads-app:$COMMIT_SHA'
       - '--region'
       - '$_REGION'
+      - '--port'
+      - '80'  # Add this line to match your Dockerfile's EXPOSE 80
       - '--platform'
       - 'managed'
       - '--allow-unauthenticated'
-
 images:
   - '$_REGION-docker.pkg.dev/$PROJECT_ID/$_REPO_NAME/leads-app:$COMMIT_SHA'
 options:
